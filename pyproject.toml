@@ -1,0 +1,25 @@
+[project]
+name = "simpsons"
+version = "0.1.0"
+description = "Little silly project"
+authors = [
+    {name = "Renata Kostolina",email = "kostolina.renata@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "torch (>=2.6.0,<3.0.0)"
+]
+
+[tool.poetry]
+packages = [{include = "simpsons", from = "src"}]
+
+
+[[tool.poetry.source]]
+name = "my-repo"
+url = "https://github.com/RenataKostolina"
+priority = "primary"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
