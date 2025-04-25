@@ -1,0 +1,6 @@
+[core]
+    remote = models
+['remote "data"']
+    url = C:/Users/kiraa/Downloads/journey-springfield
+['remote "models"']
+    url = C:/Users/kiraa/Downloads/models

@@ -1,6 +1,7 @@
 import pickle
 
 import numpy as np
+import pytorch_lightning as pl
 from PIL import Image
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
@@ -20,13 +21,14 @@ class SimpsonsDataset(Dataset):
     A dataset with images that simultaneously downloads them from folders,
     scales them and turns them into torch tensors.
 
+    Args:
+        files: List of files to download
+        mode: Operating mode, may have a value of "train", "val" or "test"
     """
 
     def __init__(self, files, mode):
         super().__init__()
-        # список файлов для загрузки
         self.files = sorted(files)
-        # режим работы
         self.mode = mode
 
         if self.mode not in DATA_MODES:
@@ -53,7 +55,6 @@ class SimpsonsDataset(Dataset):
         return image
 
     def __getitem__(self, index):
-        # для преобразования изображений в тензоры PyTorch и нормализации входа
         transform = transforms.Compose(
             [
                 transforms.ToTensor(),
@@ -77,54 +78,105 @@ class SimpsonsDataset(Dataset):
         return np.array(image)
 
 
-def init_dataloader(TRAIN_DIR: str, batch_size: int, num_workers: int = 6):
+class SimpsonsModule(pl.LightningDataModule):
     """
-    Initializing dataloaders for training and validation samples
+    A DataModule standardizes training, validation, testing, data preparation,
+    and transforms. The main advantage of this is consistent data splitting,
+    data preparation, and transformations across models.
 
     Args:
-        TRAIN_DIR: The directory where the files are located
+        train_dir (str): The directory where the train and validation files are located
+        test_dir (str): The directory where the test files are located
         batch_size (int): -
         num_workers (int, optional): -
-
-    Returns:
-        train_loader: torch.utils.data.Dataloader
-        val_loader: torch.utils.data.Dataloader
     """
-    train_val_files = sorted(list(TRAIN_DIR.rglob("*.jpg")))
-    train_val_labels = [path.parent.name for path in train_val_files]
 
-    train_val_files, train_val_labels = data_augmentation(train_val_labels)
-    train_files, val_files = train_test_split(
-        train_val_files, test_size=0.25, stratify=train_val_labels
-    )
+    def __init__(self, train_dir: str, test_dir: str, batch_size: int, num_workers: int):
+        super().__init__()
+        self.TRAIN_DIR = train_dir
+        self.TEST_DIR = test_dir
+        self.batch_size = batch_size
+        self.num_workers = num_workers
 
-    train_dataset = SimpsonsDataset(train_files, mode="train")
-    val_dataset = SimpsonsDataset(val_files, mode="val")
+    def prepare_data(self):
+        """
+        Use this to download and prepare data. Lightning ensures this method
+        is called only within a single process, so you can safely add your
+        downloading logic within.
 
-    train_loader = DataLoader(
-        train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers
-    )
-    val_loader = DataLoader(
-        val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers
-    )
-    return train_loader, val_loader
+        Return: None
+        Result: Save names of train and validation files in self.train_val_files,
+        save names of test files in self.test_files
 
+        """
+        self.train_val_files = sorted(list(self.TRAIN_DIR.rglob("*.jpg")))
+        self.test_files = sorted(list(self.TEST_DIR.rglob("*.jpg")))
 
-def init_test_loader(TEST_DIR: str, batch_size: int, num_workers: int = 6):
-    """
-    Initializing dataloaders for a test sample
-    Args:
-        TEST_DIR: The directory where the files are located
-        batch_size (int): -
-        num_workers (int, optional): -
+    def setup(self, stage=None):
+        """
+        This function is used to add augmentation for training and validation
+        files, and then create datasets.
 
-    Returns:
-        test_loader: torch.utils.data.Dataloader
-        val_loader: torch.utils.data.Dataloader
-    """
-    test_files = sorted(list(TEST_DIR.rglob("*.jpg")))
-    test_dataset = SimpsonsDataset(test_files, mode="test")
-    test_loader = DataLoader(
-        test_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers
-    )
-    return test_loader
+        Return: None
+        Result: Save datasets for training, validation and test in Class.
+        """
+        train_val_labels = [path.parent.name for path in self.train_val_files]
+
+        train_val_files, train_val_labels = data_augmentation(
+            train_val_labels, self.train_val_files, self.TRAIN_DIR
+        )
+        train_files, val_files = train_test_split(
+            train_val_files, test_size=0.25, stratify=train_val_labels
+        )
+
+        self.train_dataset = SimpsonsDataset(train_files, mode="train")
+        self.val_dataset = SimpsonsDataset(val_files, mode="val")
+        self.test_dataset = SimpsonsDataset(self.test_files, mode="test")
+
+    def train_dataloader(self):
+        """
+        Initializing dataloaders for training samples from self.train_dataset
+        with parameters of Class, such as batch_size and num_workers
+
+        Returns:
+            train_loader: torch.utils.data.Dataloader
+        """
+        return DataLoader(
+            self.train_dataset,
+            batch_size=self.batch_size,
+            shuffle=True,
+            num_workers=self.num_workers,
+            persistent_workers=True,
+        )
+
+    def val_dataloader(self):
+        """
+        Initializing dataloaders for validation samples from self.val_dataset
+        with parameters of Class, such as batch_size and num_workers
+
+        Returns:
+            val_loader: torch.utils.data.Dataloader
+        """
+        return DataLoader(
+            self.val_dataset,
+            batch_size=self.batch_size,
+            shuffle=False,
+            num_workers=self.num_workers,
+            persistent_workers=True,
+        )
+
+    def test_dataloader(self):
+        """
+        Initializing dataloaders for test samples from self.test_dataset
+        with parameters of Class, such as batch_size and num_workers
+
+        Returns:
+            test_loader: torch.utils.data.Dataloader
+        """
+        return DataLoader(
+            self.test_dataset,
+            batch_size=self.batch_size,
+            shuffle=False,
+            num_workers=self.num_workers,
+            persistent_workers=True,
+        )

@@ -1,136 +1,62 @@
+# import sys
+# sys.path.append("C:/Users/kiraa/simpsons")
+
 from pathlib import Path
 
-import torch
-import torch.nn as nn
-from tqdm import tqdm
+import hydra
+import pytorch_lightning as pl
+from omegaconf import DictConfig
 
-from simpsons.dataset import init_dataloader
+from simpsons.classifier import SimpsonsNet
+from simpsons.dataset import SimpsonsModule
 from simpsons.model import SimpsonsClassifier
 
 
-def fit_epoch(model, train_loader, criterion, optimizer, scheduler):
-    """
-    Model training for one epoch
+@hydra.main(version_base=None, config_path="../conf", config_name="cfg")
+def main(cfg: DictConfig):
+    pl.seed_everything(42)
+    data_module = SimpsonsModule(
+        train_dir=Path(cfg.module.train_dir),
+        test_dir=Path(cfg.module.test_dir),
+        batch_size=cfg.module.batch_size,
+        num_workers=cfg.module.num_workers,
+    )
+    model = SimpsonsClassifier(SimpsonsNet(n_classes=42), mode="Better")
 
-    Args:
-        model
-        train_loader
-        criterion
-        optimizer
-        scheduler
+    loggers = [
+        pl.loggers.WandbLogger(
+            project=cfg.logging.project,
+            name=cfg.logging.name,
+            save_dir=cfg.logging.save_dir,
+        ),
+    ]
 
-    Returns:
-        Train loss, train accuracy
+    callbacks = [
+        pl.callbacks.LearningRateMonitor(logging_interval="step"),
+        pl.callbacks.DeviceStatsMonitor(),
+        pl.callbacks.RichModelSummary(max_depth=2),
+    ]
 
-    """
-    running_loss = 0.0
-    running_corrects = 0
-    processed_data = 0
+    callbacks.append(
+        pl.callbacks.ModelCheckpoint(
+            dirpath=cfg.callbacks.dirpath,
+            filename=cfg.callbacks.filename,
+            monitor="val_loss",
+            save_top_k=1,
+            every_n_epochs=1,
+        )
+    )
 
-    for inputs, labels in train_loader:
-        inputs = inputs.to(DEVICE)
-        labels = labels.to(DEVICE)
-        optimizer.zero_grad()
+    trainer = pl.Trainer(
+        max_epochs=cfg.trainer.epoch,
+        log_every_n_steps=1,
+        accelerator="auto",
+        devices="auto",
+        logger=loggers,
+        callbacks=callbacks,
+    )
 
-        outputs = model(inputs)
-        loss = criterion(outputs, labels)
-        loss.backward()
-        optimizer.step()
-        preds = torch.argmax(outputs, 1)
-        running_loss += loss.item() * inputs.size(0)
-        running_corrects += torch.sum(preds == labels.data)
-        processed_data += inputs.size(0)
-
-    scheduler.step()
-    train_loss = running_loss / processed_data
-    train_acc = running_corrects.cpu().numpy() / processed_data
-    return train_loss, train_acc
-
-
-def eval_epoch(model, val_loader, criterion):
-    """
-    Validation of the model for one epoch
-
-    Args:
-        model
-        val_loader
-        criterion
-
-    Returns:
-        Validation loss, validation accuracy
-
-    """
-    model.eval()
-    running_loss = 0.0
-    running_corrects = 0
-    processed_size = 0
-
-    for inputs, labels in val_loader:
-        inputs = inputs.to(DEVICE)
-        labels = labels.to(DEVICE)
-
-        with torch.set_grad_enabled(False):
-            outputs = model(inputs)
-            loss = criterion(outputs, labels)
-            preds = torch.argmax(outputs, 1)
-
-        running_loss += loss.item() * inputs.size(0)
-        running_corrects += torch.sum(preds == labels.data)
-        processed_size += inputs.size(0)
-    val_loss = running_loss / processed_size
-    val_acc = running_corrects.double() / processed_size
-    return val_loss, val_acc
-
-
-# определим директории с тренировочными и тестовыми файлами
-TRAIN_DIR = Path("./train/")
-TEST_DIR = Path("./test/")
-
-
-def train_model(model, train_loader, val_loader, epochs, criterion, optimizer, scheduler):
-    """
-    Model training
-
-    """
-    history = []
-    log_template = "\nEpoch {ep:03d} train_loss: {t_loss:0.4f} \
-    val_loss {v_loss:0.4f} train_acc {t_acc:0.4f} val_acc {v_acc:0.4f}"
-
-    with tqdm(desc="epoch", total=epochs) as pbar_outer:
-        for epoch in range(epochs):
-            train_loss, train_acc = fit_epoch(model, train_loader, criterion, optimizer, scheduler)
-            val_loss, val_acc = eval_epoch(model, val_loader, criterion)
-            history.append((train_loss, train_acc, val_loss, val_acc))
-
-            pbar_outer.update(1)
-            tqdm.write(
-                log_template.format(
-                    ep=epoch + 1,
-                    t_loss=train_loss,
-                    v_loss=val_loss,
-                    t_acc=train_acc,
-                    v_acc=val_acc,
-                )
-            )
-
-    return history
-
-
-DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-
-def main():
-    model = SimpsonsClassifier()
-    batch_size = 256
-    epochs = 20
-    optimizer = torch.optim.Adam(model.parameters())
-    criterion = nn.CrossEntropyLoss()
-    scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer=optimizer, gamma=0.5)
-
-    train_loader, val_loader = init_dataloader(TRAIN_DIR, batch_size=batch_size)
-    history = train_model(model, train_loader, val_loader, epochs, criterion, optimizer, scheduler)
-
-    return history
+    trainer.fit(model, datamodule=data_module)
 
 
 if __name__ == "__main__":

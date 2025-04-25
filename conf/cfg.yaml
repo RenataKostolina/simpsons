@@ -1,0 +1,21 @@
+module:
+  train_dir: "C:/Users/kiraa/simpsons/data/journey-springfield/train"
+  test_dir: "C:/Users/kiraa/simpsons/data/journey-springfield/testset"
+  batch_size: 128
+  num_workers: 2
+
+logging:
+  project: "simpsons"
+  name: "simpsons-classifier"
+  save_dir: "."
+
+callbacks:
+  dirpath: "C:/Users/kiraa/simpsons/models/simpsons_net/"
+  filename: "{epoch:02d}-{val_loss:.4f}"
+
+trainer:
+  epoch: 1
+
+inference:
+  ckpt: "../simpsons/models/simpsons_net/epoch=12-val_loss=0.5309.ckpt"
+  dir: "C:/Users/kiraa/simpsons/data/journey-springfield/test"
