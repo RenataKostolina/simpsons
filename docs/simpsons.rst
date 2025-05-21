@@ -12,10 +12,42 @@ simpsons.augmentation module
    :undoc-members:
    :show-inheritance:
 
+simpsons.check\_data module
+---------------------------
+
+.. automodule:: simpsons.check_data
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+simpsons.classifier module
+--------------------------
+
+.. automodule:: simpsons.classifier
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+simpsons.convert\_to\_onnx module
+---------------------------------
+
+.. automodule:: simpsons.convert_to_onnx
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 simpsons.dataset module
 -----------------------
 
 .. automodule:: simpsons.dataset
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+simpsons.inference module
+-------------------------
+
+.. automodule:: simpsons.inference
    :members:
    :undoc-members:
    :show-inheritance:

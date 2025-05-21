@@ -1,0 +1,3 @@
+project: "simpsons"
+name: "simpsons-classifier"
+save_dir: "."

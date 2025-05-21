@@ -7,6 +7,7 @@ import hydra
 import pytorch_lightning as pl
 from omegaconf import DictConfig
 
+from simpsons.check_data import ensure_data_downloaded
 from simpsons.classifier import SimpsonsNet
 from simpsons.dataset import SimpsonsModule
 from simpsons.model import SimpsonsClassifier
@@ -14,6 +15,14 @@ from simpsons.model import SimpsonsClassifier
 
 @hydra.main(version_base=None, config_path="../conf", config_name="cfg")
 def main(cfg: DictConfig):
+    REQUIRED_PATHS = [cfg.module.test_dir, cfg.module.train_dir]
+
+    if ensure_data_downloaded(REQUIRED_PATHS):
+        print("Data ready for processing")
+    else:
+        print("Failed to download required data")
+        exit(1)
+
     pl.seed_everything(42)
     data_module = SimpsonsModule(
         train_dir=Path(cfg.module.train_dir),

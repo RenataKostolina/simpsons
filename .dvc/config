@@ -1,6 +1,9 @@
 [core]
-    remote = models
-['remote "data"']
-    url = C:/Users/kiraa/Downloads/journey-springfield
-['remote "models"']
-    url = C:/Users/kiraa/Downloads/models
+    remote = simpsons
+
+['remote "simpsons"']
+    url = s3://simpsons
+    endpointurl = https://storage.yandexcloud.net
+    region = ru-central1
+    access_key_id = YCAJE2UASkj9czOOLwZSGTHSX
+    secret_access_key = YCNvU2wCBV5_mL-i7i7onf3i0eT5zRvarVnoCbiL

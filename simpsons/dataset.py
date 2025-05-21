@@ -10,11 +10,6 @@ from torchvision import transforms
 
 from simpsons.augmentation import data_augmentation
 
-# разные режимы датасета
-DATA_MODES = ["train", "val", "test"]
-# все изображения будут масштабированы к размеру 224x224 px
-RESCALE_SIZE = 224
-
 
 class SimpsonsDataset(Dataset):
     """
@@ -30,6 +25,7 @@ class SimpsonsDataset(Dataset):
         super().__init__()
         self.files = sorted(files)
         self.mode = mode
+        DATA_MODES = ["train", "val", "test"]
 
         if self.mode not in DATA_MODES:
             print(f"{self.mode} is not correct; correct modes: {DATA_MODES}")
@@ -74,7 +70,7 @@ class SimpsonsDataset(Dataset):
             return x, y
 
     def _prepare_sample(self, image):
-        image = image.resize((RESCALE_SIZE, RESCALE_SIZE))
+        image = image.resize((224, 224))
         return np.array(image)
 
 

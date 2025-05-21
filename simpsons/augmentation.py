@@ -16,16 +16,6 @@ def load_image(file: str):
     return image
 
 
-augmenters = transforms.RandomChoice(
-    [
-        transforms.Compose([transforms.Resize(size=224), transforms.RandomCrop(180)]),
-        transforms.RandomRotation(degrees=(-45, 45)),
-        transforms.RandomHorizontalFlip(p=1),
-        transforms.RandomPerspective(distortion_scale=0.7),
-    ]
-)
-
-
 def data_augmentation(train_labels, train_files, TRAIN_DIR):
     """
     Adds augmentation to data using RandomRotation, RandomHorizontalFlip,
@@ -46,6 +36,15 @@ def data_augmentation(train_labels, train_files, TRAIN_DIR):
 
     data["iteration"] = 1500 - data["count"]
     data.loc[data["iteration"] < 0, "iteration"] = 0
+
+    augmenters = transforms.RandomChoice(
+        [
+            transforms.Compose([transforms.Resize(size=224), transforms.RandomCrop(180)]),
+            transforms.RandomRotation(degrees=(-45, 45)),
+            transforms.RandomHorizontalFlip(p=1),
+            transforms.RandomPerspective(distortion_scale=0.7),
+        ]
+    )
 
     for image_path in tqdm(train_files):
         path = image_path.parents[0]

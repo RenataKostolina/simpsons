@@ -1,0 +1,2 @@
+dirpath: "../models/simpsons_net/"
+filename: "{epoch:02d}-{val_loss:.4f}"

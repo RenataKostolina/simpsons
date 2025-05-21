@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simpsons Classifier</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .upload-container {
+            border: 2px dashed #ccc;
+            padding: 2rem;
+            text-align: center;
+            margin: 2rem 0;
+            border-radius: 5px;
+        }
+        #preview {
+            max-width: 300px;
+            margin-top: 1rem;
+            display: none;
+        }
+        .result {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #f5f5f5;
+            border-radius: 5px;
+            display: none;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:disabled {
+            background: #cccccc;
+        }
+        .spinner {
+            display: none;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Simpsons Character Classifier</h1>
+
+    <div class="upload-container" id="drop-zone">
+        <p>Drag & drop your image here or click to select</p>
+        <input type="file" id="file-input" accept="image/*" style="display: none;">
+    </div>
+
+    <div>
+        <button id="predict-btn" disabled>Classify</button>
+        <span class="spinner" id="spinner">Processing...</span>
+    </div>
+
+    <img id="preview" alt="Preview">
+
+    <div class="result" id="result">
+        <h3>Prediction Result:</h3>
+        <p><strong>Class:</strong> <span id="class-result"></span></p>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const predictBtn = document.getElementById('predict-btn');
+        const spinner = document.getElementById('spinner');
+        const preview = document.getElementById('preview');
+        const resultDiv = document.getElementById('result');
+        let currentFile = null;
+
+        // Обработка drag and drop
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#4CAF50';
+        });
+
+        ['dragleave', 'dragend'].forEach(type => {
+            dropZone.addEventListener(type, () => {
+                dropZone.style.borderColor = '#ccc';
+            });
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#ccc';
+
+            if (e.dataTransfer.files.length) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Please upload an image file');
+                return;
+            }
+
+            currentFile = file;
+            predictBtn.disabled = false;
+
+            // Показываем превью
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                resultDiv.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        predictBtn.addEventListener('click', async () => {
+            if (!currentFile) return;
+
+            const formData = new FormData();
+            formData.append('file', currentFile);
+
+            // Показываем спиннер
+            predictBtn.disabled = true;
+            spinner.style.display = 'inline-block';
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(await response.text());
+                }
+
+                const result = await response.json();
+
+                // Показываем результат
+                document.getElementById('class-result').textContent = result.class;
+                resultDiv.style.display = 'block';
+
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            } finally {
+                predictBtn.disabled = false;
+                spinner.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -27,7 +27,7 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-wandb/
+read
 outputs/
 lightning_logs/
 lightning_logs/version_0

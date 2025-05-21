@@ -1,0 +1,2 @@
+ckpt: "../simpsons/models/simpsons_net/epoch=12-val_loss=0.5309.ckpt"
+dir: "../simpsons/data/journey-springfield/test"
