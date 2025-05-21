@@ -1,4 +1,4 @@
-<video src="https://github.com/RenataKostolina/simpsons/blob/02f9b4a007322b00e5e8fa8fe066a0f98ff0f7cc/triton_server.mp4" controls width="500"></video>
+[![Video Demo](https://img.youtube.com/vi/Oah91n-3b2A/0.jpg)](https://youtu.be/Oah91n-3b2A)
 
 # Project Structure
 ```
