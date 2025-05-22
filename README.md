@@ -132,8 +132,8 @@ simpsons/
 
 ## Setup
 
-```powershell
-
+```
+# powershell
 # Клонирование репозитория
 git clone https://github.com/RenataKostolina/simpsons
 cd simpsons
@@ -157,7 +157,8 @@ poetry run pre-commit run --all-files
 
 ## Testing
 
-```powershell
+```
+# powershell
 # Запуск тестов
 poetry run pytest tests/ -m "not requires_files"
 
@@ -165,7 +166,8 @@ poetry run pytest tests/ -m "not requires_files"
 
 ## Train
 
-```powershell
+```
+# powershell
 # Активация окружения (если не активировано)
 poetry env activate
 
@@ -178,7 +180,8 @@ poetry run python ./simpsons/train.py
 
 ## Production preparation
 
-```powershell
+```
+# powershell
 # Экспорт в ONNX
 poetry run python ./simpsons/convert_to_onnx.py
 ```
@@ -203,7 +206,8 @@ triton
 А также установить Docker с официального сайта:
 https://www.docker.com/products/docker-desktop/
 
-```bash
+```
+# bash
 # Переход в директорию с Triton (убедитесь, что вы находитесь в корне проекта перед выполнением этой команды)
 cd triton
 
@@ -222,7 +226,8 @@ docker-compose up
 
 Сервис будет доступен в браузере по адресу: http://127.0.0.1:8080/
 
-```bash
+```
+# bash
 # Остановка сервисов
 docker-compose down
 ```
