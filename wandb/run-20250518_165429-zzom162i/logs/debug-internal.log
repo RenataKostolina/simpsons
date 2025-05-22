@@ -1,0 +1,16 @@
+{"time":"2025-05-18T16:54:29.9567025+03:00","level":"INFO","msg":"stream: starting","core version":"0.19.11","symlink path":"C:\\Users\\kiraa\\simpsons\\wandb\\run-20250518_165429-zzom162i\\logs\\debug-core.log"}
+{"time":"2025-05-18T16:54:30.9634038+03:00","level":"INFO","msg":"created new stream","id":"zzom162i"}
+{"time":"2025-05-18T16:54:30.9639371+03:00","level":"INFO","msg":"stream: started","id":"zzom162i"}
+{"time":"2025-05-18T16:54:30.9645452+03:00","level":"INFO","msg":"writer: Do: started","stream_id":"zzom162i"}
+{"time":"2025-05-18T16:54:30.9666563+03:00","level":"INFO","msg":"sender: started","stream_id":"zzom162i"}
+{"time":"2025-05-18T16:54:30.9676069+03:00","level":"INFO","msg":"handler: started","stream_id":"zzom162i"}
+{"time":"2025-05-18T16:54:31.3781224+03:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-05-18T16:54:33.419223+03:00","level":"WARN","msg":"sender: sendUseArtifact: job builder disabled, skipping"}
+{"time":"2025-05-18T16:54:38.984711+03:00","level":"INFO","msg":"stream: closing","id":"zzom162i"}
+{"time":"2025-05-18T16:54:38.984711+03:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-05-18T16:54:38.9852196+03:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-05-18T16:54:40.0994908+03:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-05-18T16:54:40.484891+03:00","level":"INFO","msg":"sender: closed","stream_id":"zzom162i"}
+{"time":"2025-05-18T16:54:40.484891+03:00","level":"INFO","msg":"handler: closed","stream_id":"zzom162i"}
+{"time":"2025-05-18T16:54:40.4850171+03:00","level":"INFO","msg":"writer: Close: closed","stream_id":"zzom162i"}
+{"time":"2025-05-18T16:54:40.4855253+03:00","level":"INFO","msg":"stream: closed","id":"zzom162i"}

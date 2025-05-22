@@ -1,3 +1,7 @@
+# Custom
+/wandb/run-20250518_165429-zzom162i/run-zzom162i.wandb
+/wandb/run-20250518_165429-zzom162i/tmp
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -62,6 +66,8 @@ coverage.xml
 
 # Django stuff:
 *.log
+!wandb/run-20250518_165429-zzom162i/logs/debug-internal.log
+!wandb/run-20250518_165429-zzom162i/logs/debug.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
