@@ -8,8 +8,8 @@ from simpsons.dataset import SimpsonsModule
 @pytest.fixture
 def datamodule():
     data_module = SimpsonsModule(
-        train_dir=Path("C:/Users/kiraa/simpsons/data/journey-springfield/train"),
-        test_dir=Path("C:/Users/kiraa/simpsons/data/journey-springfield/testset"),
+        train_dir=Path("./data/journey-springfield/train"),
+        test_dir=Path("./data/journey-springfield/test"),
         batch_size=128,
         num_workers=2,
     )
