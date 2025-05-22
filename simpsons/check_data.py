@@ -1,9 +1,9 @@
 import os
 import subprocess
-from typing import List, Optional
+from typing import List
 
 
-def dvc_pull(target_paths: Optional[List[str]] = None) -> bool:
+def dvc_pull() -> bool:
     """
     Performs a dvc pull for the specified paths with error handling.
 
@@ -17,8 +17,6 @@ def dvc_pull(target_paths: Optional[List[str]] = None) -> bool:
     """
     try:
         cmd = ["poetry", "run", "dvc", "pull"]
-        if target_paths:
-            cmd.extend(target_paths)
 
         result = subprocess.run(cmd, check=True, text=True, capture_output=True)
 
