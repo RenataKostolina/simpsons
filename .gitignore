@@ -1,6 +1,7 @@
 # Custom
 /wandb/run-20250518_165429-zzom162i/run-zzom162i.wandb
 /wandb/run-20250518_165429-zzom162i/tmp
+*.wandb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
