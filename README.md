@@ -147,9 +147,6 @@ pip install poetry==2.1.2
 # Установка зависимостей
 poetry install
 
-# Инициализация DVC
-poetry run dvc init
-
 # Установка хуков
 poetry run pre-commit install
 
@@ -173,13 +170,10 @@ poetry run pytest tests/ -m "not requires_files"
 poetry env activate
 
 # Авторизация в Weights & Biases
-poetry run wandb login  # Введите API-ключ при запросе
+poetry run wandb login --relogin  # Введите API-ключ при запросе
 
 # Тренировка модели
 poetry run python ./simpsons/train.py
-
-# После обучения в директории сonf/inference/ измените поле ckpt на путь к вашей модели или добавьте исходную с помощью
-poetry run dvc pull models/
 ```
 
 ## Production preparation
